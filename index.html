@@ -1,653 +1,231 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PLAYER DATA: KHOUZAMA</title>
-  <style>
-    :root{
-      --bg0:#05070c;
-      --bg1:#070b14;
-      --panel:#0b1222cc;
-      --panel2:#0f1a33cc;
-      --stroke:#2a3b66;
-      --stroke2:#1a2544;
-      --txt:#d7e2ff;
-      --muted:#9fb0da;
-      --cyan:#5fe3ff;
-      --violet:#b67cff;
-      --black:#0b0b10;
-      --good:#7CFFB1;
-      --warn:#ffd36b;
-      --bad:#ff6b6b;
-      --shadow: 0 20px 80px rgba(0,0,0,.55);
-      --glow: 0 0 22px rgba(95,227,255,.18);
-      --radius:18px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Khouzama ✨ Kawaii Player</title>
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      color:var(--txt);
-      font-family:var(--sans);
-      background:
-        radial-gradient(1200px 700px at 20% 10%, rgba(95,227,255,.08), transparent 60%),
-        radial-gradient(900px 600px at 90% 20%, rgba(182,124,255,.10), transparent 55%),
-        radial-gradient(700px 500px at 30% 90%, rgba(95,227,255,.06), transparent 55%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
-      overflow-x:hidden;
-    }
+<style>
+:root{
+  --bg:#0b0f1f;
+  --card:#141a3a;
+  --pink:#ffb7e6;
+  --purple:#c7b7ff;
+  --mint:#a6fff3;
+  --text:#f6f7ff;
+  --soft:#ffffff18;
+  --radius:20px;
+}
 
-    /* subtle noise */
-    body:before{
-      content:"";
-      position:fixed; inset:0;
-      pointer-events:none;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
-      mix-blend-mode:overlay;
-      opacity:.35;
-    }
+*{box-sizing:border-box}
 
-    .wrap{
-      min-height:100%;
-      display:grid;
-      place-items:center;
-      padding:28px 14px 40px;
-    }
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top, #c7b7ff33, transparent 50%),
+    radial-gradient(circle at bottom, #ffb7e633, transparent 50%),
+    linear-gradient(180deg,#050714,#0b0f1f);
+  font-family:"Comic Sans MS", system-ui, sans-serif;
+  color:var(--text);
+  display:grid;
+  place-items:center;
+  padding:20px;
+}
 
-    .hud{
-      width:min(980px, 100%);
-      border-radius:calc(var(--radius) + 6px);
-      padding:18px;
-      background:linear-gradient(180deg, rgba(15,26,51,.75), rgba(9,14,27,.72));
-      border:1px solid rgba(42,59,102,.7);
-      box-shadow: var(--shadow);
-      position:relative;
-      overflow:hidden;
-      transform: translateY(10px);
-      opacity:0;
-      animation: bootIn .8s ease forwards;
-    }
+.card{
+  width:100%;
+  max-width:420px;
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:0 20px 60px #000000aa;
+  animation:pop 0.8s ease;
+}
 
-    @keyframes bootIn{
-      to{transform:translateY(0); opacity:1}
-    }
+@keyframes pop{
+  0%{transform:scale(.8); opacity:0}
+  100%{transform:scale(1); opacity:1}
+}
 
-    /* scan line */
-    .hud:after{
-      content:"";
-      position:absolute; inset:-60px -40px;
-      background:
-        linear-gradient(transparent 0%, rgba(95,227,255,.12) 50%, transparent 100%);
-      transform: translateY(-140%);
-      animation: scan 2.2s ease-in-out infinite;
-      pointer-events:none;
-      filter: blur(0.2px);
-      opacity:.65;
-    }
-    @keyframes scan{
-      0%{transform:translateY(-140%)}
-      55%{transform:translateY(140%)}
-      100%{transform:translateY(140%)}
-    }
+.header{
+  text-align:center;
+}
 
-    .topbar{
-      display:flex; align-items:flex-start; justify-content:space-between;
-      gap:12px;
-      padding:10px 10px 14px;
-      border-radius:var(--radius);
-      background:linear-gradient(180deg, rgba(11,18,34,.62), rgba(11,18,34,.35));
-      border:1px solid rgba(42,59,102,.55);
-      box-shadow: var(--glow);
-    }
-    .title{
-      font-family:var(--mono);
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      font-size:14px;
-      color:rgba(215,226,255,.92);
-    }
-    .loaded{
-      margin-top:6px;
-      font-family:var(--mono);
-      font-size:28px;
-      letter-spacing:.06em;
-      color:var(--cyan);
-      text-shadow: 0 0 18px rgba(95,227,255,.28);
-      line-height:1.1;
-    }
-    .sub{
-      margin-top:6px;
-      color:var(--muted);
-      font-size:13px;
-      display:flex; gap:10px; flex-wrap:wrap;
-      font-family:var(--mono);
-    }
-    .pill{
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(42,59,102,.75);
-      background:rgba(7,11,20,.55);
-      box-shadow: inset 0 0 0 1px rgba(26,37,68,.25);
-      white-space:nowrap;
-    }
+.name{
+  font-size:28px;
+  font-weight:700;
+  color:var(--pink);
+}
 
-    .controls{
-      display:flex; gap:10px; align-items:center;
-      justify-content:flex-end;
-    }
-    .btn{
-      cursor:pointer;
-      user-select:none;
-      font-family:var(--mono);
-      font-size:12px;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(42,59,102,.8);
-      background:rgba(9,14,27,.75);
-      color:var(--txt);
-      transition:.18s ease;
-      box-shadow: inset 0 0 0 1px rgba(26,37,68,.25), 0 8px 30px rgba(0,0,0,.22);
-    }
-    .btn:hover{ transform: translateY(-1px); border-color: rgba(95,227,255,.65); }
-    .btn:active{ transform: translateY(0px) scale(.99); }
-    .btn.primary{
-      border-color: rgba(95,227,255,.65);
-      box-shadow: 0 0 0 1px rgba(95,227,255,.18), 0 10px 40px rgba(95,227,255,.06);
-    }
+.subtitle{
+  font-size:13px;
+  opacity:.85;
+}
 
-    .grid{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:14px;
-    }
+.badges{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin:12px 0;
+  flex-wrap:wrap;
+}
 
-    @media (max-width: 880px){
-      .grid{ grid-template-columns: 1fr; }
-      .controls{justify-content:flex-start}
-      .loaded{font-size:24px}
-    }
+.badge{
+  background:var(--soft);
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+}
 
-    .card{
-      border-radius:var(--radius);
-      background:linear-gradient(180deg, rgba(11,18,34,.62), rgba(11,18,34,.35));
-      border:1px solid rgba(42,59,102,.55);
-      padding:14px;
-      box-shadow: var(--glow);
-      position:relative;
-      overflow:hidden;
-    }
+.stats{
+  margin:16px 0;
+}
 
-    .card h3{
-      margin:0 0 10px 0;
-      font-family:var(--mono);
-      letter-spacing:.09em;
-      text-transform:uppercase;
-      font-size:13px;
-      color:rgba(215,226,255,.9);
-      display:flex; align-items:center; gap:8px;
-    }
+.stat{
+  margin-bottom:10px;
+}
 
-    .stats{
-      display:grid;
-      gap:10px;
-    }
-    .stat{
-      display:grid;
-      grid-template-columns: 170px 1fr;
-      gap:10px;
-      align-items:center;
-    }
-    @media (max-width:540px){
-      .stat{ grid-template-columns: 1fr; }
-    }
+.stat label{
+  font-size:12px;
+}
 
-    .label{
-      font-family:var(--mono);
-      font-size:12px;
-      color:var(--muted);
-      letter-spacing:.06em;
-      text-transform:uppercase;
-    }
-    .bar{
-      height:12px;
-      border-radius:999px;
-      border:1px solid rgba(42,59,102,.7);
-      background:rgba(7,11,20,.55);
-      overflow:hidden;
-      position:relative;
-    }
-    .fill{
-      height:100%;
-      width:0%;
-      border-radius:999px;
-      background:linear-gradient(90deg, rgba(95,227,255,.85), rgba(182,124,255,.85));
-      box-shadow: 0 0 18px rgba(95,227,255,.18);
-      transition: width 1.2s cubic-bezier(.2,.9,.2,1);
-    }
-    .fill.dim{
-      background:linear-gradient(90deg, rgba(215,226,255,.35), rgba(95,227,255,.55));
-    }
+.bar{
+  height:8px;
+  background:#00000055;
+  border-radius:999px;
+  overflow:hidden;
+}
 
-    .traits{
-      display:grid;
-      gap:10px;
-      color:rgba(215,226,255,.92);
-      font-size:14px;
-      line-height:1.45;
-    }
-    .traits ul{
-      margin:0; padding-left:18px;
-      color:rgba(215,226,255,.9);
-    }
-    .traits li{ margin:6px 0; }
-    .muted{ color:var(--muted); font-family:var(--mono); font-size:12px; }
+.fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--mint),var(--purple));
+  border-radius:999px;
+  animation:load 1.2s ease;
+}
 
-    .inventory{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    @media (max-width: 520px){
-      .inventory{ grid-template-columns: 1fr; }
-    }
-    .item{
-      display:flex; align-items:center; gap:10px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(42,59,102,.6);
-      background:rgba(7,11,20,.52);
-      transition:.18s ease;
-    }
-    .item:hover{
-      border-color: rgba(95,227,255,.55);
-      transform: translateY(-1px);
-    }
-    .ico{
-      width:28px; height:28px;
-      border-radius:10px;
-      display:grid; place-items:center;
-      background:rgba(95,227,255,.08);
-      border:1px solid rgba(95,227,255,.18);
-      font-size:16px;
-    }
-    .item span{
-      font-family:var(--mono);
-      font-size:12px;
-      letter-spacing:.02em;
-      color:rgba(215,226,255,.92);
-    }
+@keyframes load{
+  from{width:0}
+}
 
-    .secret{
-      border-style:dashed;
-      border-color: rgba(182,124,255,.6);
-      background:linear-gradient(180deg, rgba(182,124,255,.08), rgba(7,11,20,.52));
-    }
-    .secret .ico{
-      background:rgba(182,124,255,.12);
-      border-color:rgba(182,124,255,.3);
-    }
-    .secretNote{
-      margin-top:10px;
-      border-top:1px solid rgba(42,59,102,.45);
-      padding-top:10px;
-      display:none;
-      animation: pop .25s ease forwards;
-    }
-    @keyframes pop{
-      from{transform:translateY(4px); opacity:.2}
-      to{transform:translateY(0); opacity:1}
-    }
+.traits{
+  background:var(--soft);
+  padding:12px;
+  border-radius:var(--radius);
+  margin-bottom:12px;
+}
 
-    .footer{
-      margin-top:14px;
-      display:grid;
-      gap:14px;
-      grid-template-columns: 1.2fr .8fr;
-    }
-    @media (max-width: 880px){
-      .footer{ grid-template-columns: 1fr; }
-    }
+.traits li{
+  font-size:13px;
+  margin:6px 0;
+}
 
-    .lore{
-      font-size:14px;
-      line-height:1.55;
-      color:rgba(215,226,255,.92);
-    }
-    .lore b{ color:var(--cyan); font-family:var(--mono); letter-spacing:.04em; }
-    .word{
-      margin-top:10px;
-      font-family:var(--mono);
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      font-size:13px;
-      color:rgba(215,226,255,.92);
-    }
-    .word .tag{
-      display:inline-block;
-      margin-left:8px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(182,124,255,.65);
-      background:rgba(182,124,255,.10);
-      color:var(--violet);
-      box-shadow: 0 0 18px rgba(182,124,255,.10);
-    }
+.buttons{
+  display:flex;
+  gap:10px;
+}
 
-    .type{
-      font-family:var(--mono);
-      white-space:pre-wrap;
-      letter-spacing:.02em;
-    }
+button{
+  flex:1;
+  border:none;
+  border-radius:999px;
+  padding:10px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#000;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+}
 
-    .blink{
-      display:inline-block;
-      width:10px;
-      animation: blink 1s steps(2,end) infinite;
-      color:var(--cyan);
-    }
-    @keyframes blink{ 50%{opacity:0} }
+button:hover{
+  transform:scale(1.05);
+}
 
-    .hint{
-      margin-top:10px;
-      font-family:var(--mono);
-      font-size:12px;
-      color:rgba(159,176,218,.9);
-      opacity:.9;
-    }
-  </style>
+.secret{
+  margin-top:12px;
+  font-size:13px;
+  text-align:center;
+  opacity:.8;
+  display:none;
+}
+
+.kawaii{
+  font-size:30px;
+  animation:bounce 1.5s infinite;
+}
+
+@keyframes bounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+</style>
 </head>
+
 <body>
-  <div class="wrap">
-    <section class="hud" id="hud">
-      <div class="topbar">
-        <div>
-          <div class="title">PLAYER DATA LOADED:</div>
-          <div class="loaded">
-            KHOUZAMA<span class="blink">▌</span>
-          </div>
-          <div class="sub">
-            <div class="pill">Sound FX: <b id="sfxState">enabled</b></div>
-            <div class="pill">Born: <b>May 31</b></div>
-            <div class="pill">Main Colors: <b style="color:var(--violet)">Purple</b> + <b>Black</b></div>
-            <div class="pill">Signature: <b>Wide eyes</b> • <b>Short haircut</b></div>
-          </div>
-        </div>
 
-        <div class="controls">
-          <div class="btn" id="btnSfx">Toggle SFX</div>
-          <div class="btn primary" id="btnBoot">Reboot</div>
-        </div>
-      </div>
-
-      <div class="grid">
-        <div class="card">
-          <h3>STATS</h3>
-          <div class="stats" id="stats">
-            <div class="stat">
-              <div class="label">PATIENCE</div>
-              <div class="bar"><div class="fill" data-to="78"></div></div>
-            </div>
-            <div class="stat">
-              <div class="label">LOYALTY</div>
-              <div class="bar"><div class="fill" data-to="82"></div></div>
-            </div>
-            <div class="stat">
-              <div class="label">AWARENESS</div>
-              <div class="bar"><div class="fill" data-to="92"></div></div>
-            </div>
-            <div class="stat">
-              <div class="label">HONESTY</div>
-              <div class="bar"><div class="fill dim" data-to="70"></div></div>
-            </div>
-            <div class="stat">
-              <div class="label">CHAOS (CONTROL)</div>
-              <div class="bar"><div class="fill" data-to="88"></div></div>
-            </div>
-          </div>
-
-          <div style="height:12px"></div>
-          <h3>PASSIVE TRAITS</h3>
-          <div class="traits">
-            <ul>
-              <li>Reads people without words.</li>
-              <li>Notices micro-details.</li>
-              <li>Carries more than she shows.</li>
-              <li>Pulls back to breathe — not to hurt.</li>
-              <li><b>Silence</b> = not satisfied.</li>
-            </ul>
-            <div class="muted">Calm with strangers • playful with her circle • head + heart combo</div>
-          </div>
-
-          <div style="height:12px"></div>
-          <div class="item secret" id="toggleSecret" role="button" tabindex="0" title="Tap to toggle">
-            <div class="ico">🔒</div>
-            <div>
-              <div style="font-family:var(--mono); font-size:12px; letter-spacing:.06em;">SECRET TRAIT (TAP TO TOGGLE)</div>
-              <div style="font-size:13px; color:rgba(215,226,255,.92); margin-top:4px;">
-                Understands looks — no explanation needed.
-              </div>
-            </div>
-          </div>
-
-          <div class="secretNote" id="secretBox">
-            <div class="muted">Unlocked details:</div>
-            <ul style="margin:8px 0 0; padding-left:18px; color:rgba(215,226,255,.92)">
-              <li>Softness only shows with safe people.</li>
-              <li>Strongest version appears under pressure.</li>
-              <li>Main switch: <b>honesty</b>.</li>
-              <li>Combo: coffee + food + movies → calm state.</li>
-            </ul>
-          </div>
-
-          <div class="hint">Tip: Tap the secret trait. Also try “Reboot”.</div>
-        </div>
-
-        <div class="card">
-          <h3>INVENTORY ITEMS</h3>
-          <div class="inventory">
-            <div class="item"><div class="ico">☕</div><span>Black coffee (non-negotiable)</span></div>
-            <div class="item"><div class="ico">🧻</div><span>Tissues (just in case)</span></div>
-            <div class="item"><div class="ico">🎶</div><span>Latin music</span></div>
-            <div class="item"><div class="ico">📱</div><span>Phone + Internet</span></div>
-            <div class="item"><div class="ico">💜</div><span>Appreciation</span></div>
-            <div class="item"><div class="ico">🏆</div><span>Rewards</span></div>
-          </div>
-
-          <div style="height:14px"></div>
-          <h3>VIBE</h3>
-          <div class="traits">
-            <ul>
-              <li>Night energy 🌙</li>
-              <li>Cold weather lover ❄️</li>
-              <li>Open spaces &gt; closed rooms</li>
-              <li>Feels herself with people she loves</li>
-              <li>Thinks & creates best in <b>controlled chaos</b></li>
-            </ul>
-          </div>
-
-          <div style="height:14px"></div>
-          <h3>MORAL SYSTEM</h3>
-          <div class="traits">
-            <ul>
-              <li>Forgives: <b style="color:var(--warn)">rarely</b></li>
-              <li>Remembers, stays quiet.</li>
-              <li>Strong boundaries.</li>
-              <li>No tolerance for <b style="color:var(--bad)">disrespect</b>.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer">
-        <div class="card">
-          <h3>LORE</h3>
-          <div class="lore type" id="loreType"></div>
-          <div class="word">One word: <span class="tag">Attractive</span></div>
-        </div>
-
-        <div class="card">
-          <h3>SYSTEM LOG</h3>
-          <div class="type" id="log" style="color:rgba(215,226,255,.92); font-size:13px; line-height:1.55;"></div>
-        </div>
-      </div>
-    </section>
+<div class="card">
+  <div class="header">
+    <div class="kawaii">🎮✨</div>
+    <div class="name">Khouzama</div>
+    <div class="subtitle">Cute • Playful • Cozy Gamer</div>
   </div>
 
-  <script>
-    // ========== SFX (No external files) ==========
-    let sfxEnabled = true;
-    let audioCtx;
+  <div class="badges">
+    <div class="badge">🌙 Night lover</div>
+    <div class="badge">☕ Coffee main</div>
+    <div class="badge">🎧 Latin vibes</div>
+    <div class="badge">💖 Soft energy</div>
+  </div>
 
-    function ctx(){
-      if(!audioCtx){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      return audioCtx;
-    }
+  <div class="stats">
+    <div class="stat">
+      <label>✨ Cuteness</label>
+      <div class="bar"><div class="fill" style="width:95%"></div></div>
+    </div>
+    <div class="stat">
+      <label>🎮 Playfulness</label>
+      <div class="bar"><div class="fill" style="width:90%"></div></div>
+    </div>
+    <div class="stat">
+      <label>🧠 Smart moves</label>
+      <div class="bar"><div class="fill" style="width:80%"></div></div>
+    </div>
+  </div>
 
-    function beep(freq=880, dur=0.06, type="sine", gain=0.06){
-      if(!sfxEnabled) return;
-      const c = ctx();
-      const o = c.createOscillator();
-      const g = c.createGain();
-      o.type = type;
-      o.frequency.value = freq;
-      g.gain.value = gain;
-      o.connect(g); g.connect(c.destination);
-      o.start();
-      o.stop(c.currentTime + dur);
-    }
+  <ul class="traits">
+    <li>🌸 Friendly, silly, and warm</li>
+    <li>🎀 Gets cuter when relaxed</li>
+    <li>✨ Laughs easily</li>
+    <li>🫧 Needs cozy vibes to recharge</li>
+  </ul>
 
-    function clickSfx(){
-      beep(620, 0.04, "square", 0.03);
-      beep(980, 0.03, "square", 0.02);
-    }
+  <div class="buttons">
+    <button onclick="toggleSecret()">🎁 Secret</button>
+    <button onclick="playSound()">🔊 Sound</button>
+  </div>
 
-    function unlockSfx(){
-      beep(520, 0.07, "sine", 0.05);
-      setTimeout(()=>beep(740, 0.07, "sine", 0.05), 70);
-      setTimeout(()=>beep(980, 0.10, "sine", 0.06), 140);
-    }
+  <div class="secret" id="secret">
+    💗 Soft only with safe people  
+    <br>🍿 Combo: coffee + snacks + games = happy mode  
+    <br>🌈 One word: **ADORABLE**
+  </div>
+</div>
 
-    function bootSfx(){
-      beep(220, 0.10, "triangle", 0.05);
-      setTimeout(()=>beep(330, 0.09, "triangle", 0.05), 110);
-      setTimeout(()=>beep(440, 0.08, "triangle", 0.05), 220);
-      setTimeout(()=>beep(660, 0.06, "triangle", 0.05), 310);
-      setTimeout(()=>beep(880, 0.05, "triangle", 0.04), 380);
-    }
+<audio id="popSound">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.mp3">
+</audio>
 
-    // iOS requires a user gesture to start AudioContext
-    document.addEventListener("pointerdown", () => { try{ ctx().resume(); }catch(e){} }, {once:true});
+<script>
+function toggleSecret(){
+  const s=document.getElementById("secret");
+  s.style.display = s.style.display==="block" ? "none":"block";
+  playSound();
+}
 
-    // ========== UI ==========
-    const fills = [...document.querySelectorAll(".fill")];
-    const loreEl = document.getElementById("loreType");
-    const logEl  = document.getElementById("log");
-    const btnBoot = document.getElementById("btnBoot");
-    const btnSfx  = document.getElementById("btnSfx");
-    const sfxState = document.getElementById("sfxState");
+function playSound(){
+  document.getElementById("popSound").play();
+}
+</script>
 
-    const toggleSecret = document.getElementById("toggleSecret");
-    const secretBox = document.getElementById("secretBox");
-
-    const loreText =
-`Attention finds her — she never asks.
-Those who know her well see pure generosity.
-From afar: strong charisma.
-She’s calm outside… but her circle knows she’s fun.`;
-
-    const logs = [
-      "Boot sequence: OK.",
-      "Profile integrity: stable.",
-      "Trait scan: micro-detail awareness detected.",
-      "Mode: night + cold weather preference locked.",
-      "Warning: disrespect = instant boundary.",
-      "Creative engine: best in controlled chaos.",
-      "Secret trait: tap to reveal."
-    ];
-
-    function typewrite(el, text, speed=16){
-      el.textContent = "";
-      let i = 0;
-      const t = setInterval(()=>{
-        el.textContent += text[i] || "";
-        i++;
-        if(i >= text.length) clearInterval(t);
-      }, speed);
-    }
-
-    function writeLog(lines){
-      logEl.textContent = "";
-      let i = 0;
-      const t = setInterval(()=>{
-        logEl.textContent += (lines[i] + "\n");
-        i++;
-        if(i >= lines.length) clearInterval(t);
-      }, 140);
-    }
-
-    function animateBars(){
-      requestAnimationFrame(()=>{
-        fills.forEach(f=>{
-          const to = Number(f.dataset.to || 0);
-          f.style.width = to + "%";
-        });
-      });
-    }
-
-    function resetBars(){
-      fills.forEach(f => f.style.width = "0%");
-    }
-
-    function boot(){
-      resetBars();
-      secretBox.style.display = "none";
-      typewrite(loreEl, loreText, 14);
-      writeLog(logs);
-      animateBars();
-      bootSfx();
-    }
-
-    // secret toggle
-    function toggleSecretBox(){
-      clickSfx();
-      const isOpen = secretBox.style.display === "block";
-      if(isOpen){
-        secretBox.style.display = "none";
-      }else{
-        secretBox.style.display = "block";
-        unlockSfx();
-      }
-    }
-
-    toggleSecret.addEventListener("click", toggleSecretBox);
-    toggleSecret.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter" || e.key === " "){
-        e.preventDefault();
-        toggleSecretBox();
-      }
-    });
-
-    btnBoot.addEventListener("click", ()=>{
-      clickSfx();
-      boot();
-    });
-
-    btnSfx.addEventListener("click", ()=>{
-      sfxEnabled = !sfxEnabled;
-      sfxState.textContent = sfxEnabled ? "enabled" : "muted";
-      clickSfx();
-      btnSfx.textContent = sfxEnabled ? "Toggle SFX" : "SFX Muted";
-    });
-
-    // start
-    boot();
-  </script>
 </body>
 </html>
