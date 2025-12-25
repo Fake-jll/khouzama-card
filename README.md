@@ -91,6 +91,25 @@
       50%{transform: translateY(-14px) translateX(10px) scale(1.04)}
     }
 
+    /* ✅ HERO IMAGE (added) */
+    .hero-ui{
+      position:relative;
+      z-index:1;
+      max-width: 1100px;
+      margin: 26px auto 10px;
+      padding: 0 14px;
+    }
+    .hero-ui img{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius:22px;
+      border:1px solid var(--stroke);
+      box-shadow:
+        0 18px 55px rgba(0,0,0,.55),
+        0 0 40px rgba(199,183,255,.28);
+    }
+
     .wrap{
       position:relative;
       z-index:1;
@@ -586,6 +605,11 @@
 </head>
 
 <body data-theme="kawaii">
+  <!-- ✅ HERO IMAGE FIRST (added) -->
+  <div class="hero-ui">
+    <img src="65652F8C-41FF-4D35-A6EE-C02E4509FC1B.png" alt="Khouzama Game UI">
+  </div>
+
   <div class="floaty f1"></div>
   <div class="floaty f2"></div>
   <div class="floaty f3"></div>
